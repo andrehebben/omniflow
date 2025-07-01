@@ -7,6 +7,9 @@ use Omniflow\\Sync\\TaskSyncService;
 use Omniflow\\Sync\\HabitSyncService;
 use Omniflow\\Sync\\BookSyncService;
 use Omniflow\\Sync\\GitHubSyncService;
+use Omniflow\\Api\\GitHubClient;
+use Omniflow\\Api\\YouTrackClient;
+use Omniflow\\Util\\SyncStateManager;
 
 require_once __DIR__ . '/../../vendor/autoload.php';
 
@@ -22,11 +25,21 @@ class CronRunner
         $logger = LoggerFactory::create();
         $logger->info('Starting sync run');
 
+        $stateFile = $_ENV['SYNC_STATE_FILE'] ?? __DIR__ . '/../../state.json';
+
+        $gitHub = new GitHubClient($_ENV['GITHUB_API_TOKEN'] ?? '', $logger);
+        $youTrack = new YouTrackClient(
+            $_ENV['YOUTRACK_BASE_URL'] ?? '',
+            $_ENV['YOUTRACK_API_TOKEN'] ?? '',
+            $logger
+        );
+        $state = new SyncStateManager($stateFile);
+
         $services = [
             new TaskSyncService($logger),
             new HabitSyncService($logger),
             new BookSyncService($logger),
-            new GitHubSyncService($logger),
+            new GitHubSyncService($gitHub, $youTrack, $state, $logger),
         ];
 
         foreach ($services as $service) {
