@@ -2,6 +2,8 @@
 
 Omniflow is a Dockerized PHP service that synchronizes tasks, habits and projects across multiple productivity platforms such as Todoist, Habitica, YouTrack, GitHub, Hardcover, Home Assistant and Google Calendar.
 
+The GitHub integration creates matching YouTrack projects, keeps issues in sync and mirrors milestone releases. Synchronization state is persisted so the process can recover if it falls out of sync.
+
 ## Requirements
 - Docker
 - PHP 8.3 (for local development)
@@ -14,6 +16,7 @@ cp .env.example .env
 ```
 
 Fill in the `.env` file with your API keys and preferences.
+`SYNC_STATE_FILE` stores the path for tracking the last sync time so the service can resume if it becomes out of sync.
 
 ## Running
 ### Docker
